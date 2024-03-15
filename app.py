@@ -1,29 +1,29 @@
 from flask import Flask
 import requests
-from datetime import datetime, timedelta
-import time
 import os
+from dotenv import load_dotenv
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime, timedelta
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
 def fetch_csv(url):
     response = requests.get(url)
-    # Assuming the CSV is simple and just contains emails; adapt parsing as needed
-    emails = response.text.split('\n')[1:]  # Skipping header
-    return emails
+    data = response.text.split('\n')[1:]  # Skip header
+    return [row.split(',') for row in data if row]
 
 def send_email(recipients, subject, html_content):
-    # Setup your SMTP server and credentials
-    smtp_server = "smtp.example.com"
-    smtp_port = 587
-    smtp_user = "your_email@example.com"
-    smtp_password = "your_password"
-    from_email = smtp_user  # Email from
+    smtp_server = os.getenv('SMTP_SERVER')
+    smtp_port = int(os.getenv('SMTP_PORT'))
+    smtp_user = os.getenv('SMTP_USER')
+    smtp_password = os.getenv('SMTP_PASSWORD')
+    from_email = os.getenv('FROM_EMAIL')
 
-    # Setup email content
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = from_email
@@ -32,7 +32,6 @@ def send_email(recipients, subject, html_content):
     part2 = MIMEText(html_content, 'html')
     msg.attach(part2)
 
-    # Send email
     server = smtplib.SMTP(smtp_server, smtp_port)
     server.starttls()
     server.login(smtp_user, smtp_password)
@@ -41,19 +40,20 @@ def send_email(recipients, subject, html_content):
 
 @app.route('/')
 def send_daily_email():
-    # URL of the CSV on GitHub
-    csv_url = 'https://raw.githubusercontent.com/yourusername/yourrepo/main/emails.csv'
-    emails = fetch_csv(csv_url)
-    
-    # Assume a second CSV for content, fetch and parse as needed
-    # For simplicity, I'm using static values
-    subject = "Daily Update"
-    html_content = "<html><body><h1>Hello!</h1><p>This is your daily update.</p></body></html>"
-    
-    send_email(emails, subject, html_content)
-    
-    next_run = datetime.now() + timedelta(days=1)
-    return f"Emails sent! Next run is scheduled for {next_run}"
+    emails_csv_url = os.getenv('EMAILS_CSV_URL')
+    content_csv_url = os.getenv('CONTENT_CSV_URL')
+
+    emails = [email[0] for email in fetch_csv(emails_csv_url) if email]
+    content_data = fetch_csv(content_csv_url)[0]  # Assuming single row for daily content
+
+    if content_data and len(content_data) >= 3:
+        subject, picture_link, description = content_data
+        html_content = f"<html><body><h1>{subject}</h1><img src='{picture_link}'/><p>{description}</p></body></html>"
+        send_email(emails, subject, html_content)
+        next_run = datetime.now() + timedelta(days=1)
+        return f"Emails sent! Next run is scheduled for {next_run}"
+    else:
+        return "Failed to fetch content data or data is incomplete."
 
 if __name__ == '__main__':
     app.run(debug=True)
