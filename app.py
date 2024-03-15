@@ -15,7 +15,7 @@ app = Flask(__name__)
 def fetch_csv(url):
     response = requests.get(url)
     data = response.text.split('\n')[1:]  # Skip header
-    return [row.split(',') for row in data if row]
+    return [row.split(';') for row in data if row]  # Use semicolon as delimiter
 
 def send_email(recipients, subject, html_content):
     smtp_server = os.getenv('SMTP_SERVER')
@@ -46,9 +46,16 @@ def send_daily_email():
     emails = [email[0] for email in fetch_csv(emails_csv_url) if email]
     content_data = fetch_csv(content_csv_url)[0]  # Assuming single row for daily content
 
-    if content_data and len(content_data) >= 3:
+    if content_data and len(content_data) == 3:
         subject, picture_link, description = content_data
-        html_content = f"<html><body><h1>{subject}</h1><img src='{picture_link}'/><p>{description}</p></body></html>"
+        description = description.replace('""', '"')
+
+        # Load HTML content template from index.html
+        with open('index.html', 'r', encoding='utf-8') as file:
+            html_template = file.read()
+
+        html_content = html_template.format(subject=subject, picture_link=picture_link, description=description)
+
         send_email(emails, subject, html_content)
         next_run = datetime.now() + timedelta(days=1)
         return f"Emails sent! Next run is scheduled for {next_run}"
