@@ -1,6 +1,46 @@
-<!--
-* alco was here
--->
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
+
+def send_email(recipients, subject, body):
+    smtp_server = os.getenv('SMTP_SERVER')
+    smtp_port = 465  # Updated for SSL
+    smtp_user = os.getenv('SMTP_USER')
+    smtp_password = os.getenv('SMTP_PASSWORD')
+    
+    from_email = smtp_user
+
+    try:
+        # Updated to use SSL directly
+        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        server.login(smtp_user, smtp_password)
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = from_email
+        msg['To'] = ", ".join(recipients)
+        part2 = MIMEText(body, 'html')
+        msg.attach(part2)
+        server.sendmail(from_email, recipients, msg.as_string())
+        server.quit()
+        print("Test email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send test email: {e}")
+
+
+if __name__ == "__main__":
+    csv_file_path = 'emails.csv'  # Path to your CSV file
+    recipient_email = 'falco02@gmx.de'
+
+    # Define the subject and body of your test email
+    subject = "Test Email5"
+    body = """
+    
+    
+
+
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="de">
 <head>
@@ -156,52 +196,59 @@ img,p{margin:0;Margin:0;font-family:Fira Sans,BlinkMacSystemFont,Segoe UI,Helvet
 <h1 class="t92" style="margin:0;Margin:0;font-family:Helvetica,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:28px;font-weight:700;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#424242;text-align:left;mso-line-height-rule:exactly;mso-text-raise:4px;">$subject</h1>
 </tr></table>
 </td></tr><tr><td><div class="t93" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;</div></td></tr><tr><td>
-    <table class="t95" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
-    <!--[if !mso]><!--><td class="t96" style="width:375px;">
-    <!--<![endif]-->
-    <!--[if mso]><td class="t96" style="width:375px;"><![endif]-->
-    <p class="t102" style="margin:0;Margin:0;font-family:Helvetica,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:25px;font-weight:400;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;direction:ltr;color:#424242;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">$description</p>
-    </tr></table>
-    </td></tr><tr><td><div class="t42" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;</div></td></tr><tr><td>
-    <table class="t44" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
-    <!--[if !mso]><!--><td class="t45" style="width:375px;">
-    <!--<![endif]-->
-    <!--[if mso]><td class="t45" style="width:375px;"><![endif]-->
-    <p class="t51" style="margin:0;Margin:0;font-family:Helvetica,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:25px;font-weight:400;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;direction:ltr;color:#424242;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Kids turned out fine.</p></td>
-    </tr></table>
-    </td></tr><tr><td><div class="t52" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;</div></td></tr><tr><td>
-    <table class="t59" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
-    <!--[if !mso]><!--><td class="t60" style="background-color:#FCFCFC;width:400px;padding:20px 0 0 0;">
-    <!--<![endif]-->
-    <!--[if mso]><td class="t60" style="background-color:#FCFCFC;width:400px;padding:20px 0 0 0;"><![endif]-->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td>
-    <table class="t63" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
-    <!--[if !mso]><!--><td class="t64" style="background-color:#FCFCFC;">
-    <!--<![endif]-->
-    <!--[if mso]><td class="t64" style="background-color:#FCFCFC;"><![endif]-->
-    <div class="t70" style="display:inline-table;width:100%;text-align:center;vertical-align:top;">
-    <!--[if mso]>
-    <table role="presentation" cellpadding="0" cellspacing="0" align="center" valign="top" width="86"><tr><td class="t75" style="width:3px;" width="3"></td><td width="80" valign="top"><![endif]-->
-    <div class="t76" style="display:inline-table;text-align:initial;vertical-align:inherit;width:100%;max-width:86px;"><div class="t77" style="padding:0 3px 0 3px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t78"><tr>
-    <td class="t79" style="overflow:hidden;text-align:center;line-height:20px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:5px 0 5px 0;border-radius:8px 8px 8px 8px;"><span class="t80" style="display:block;margin:0;Margin:0;font-family:BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif,'Fira Sans';line-height:20px;font-weight:500;font-style:normal;font-size:12px;text-decoration:none;direction:ltr;color:#CCCCCC;text-align:center;mso-line-height-rule:exactly;mso-text-raise:2px;">Unsubscribe</span></td>
-    </tr></table>
-    </div></div>
-    <!--[if mso]>
-    </td><td class="t75" style="width:3px;" width="3"></td>
-    </tr></table>
-    <![endif]-->
-    </div></td>
-    </tr></table>
-    </td></tr></table></td>
-    </tr></table>
-    </td></tr></table></td>
-    </tr></table>
-    </div>
-    <!--[if mso]>
-    </td>
-    </tr></table>
-    <![endif]-->
-    </div></td></tr></table></td></tr></table></div></body>
-    </html>
+<table class="t95" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
+<!--[if !mso]><!--><td class="t96" style="width:375px;">
+<!--<![endif]-->
+<!--[if mso]><td class="t96" style="width:375px;"><![endif]-->
+<p class="t102" style="margin:0;Margin:0;font-family:Helvetica,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:25px;font-weight:400;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;direction:ltr;color:#424242;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">$description</p>
+</tr></table>
+</td></tr><tr><td><div class="t42" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;</div></td></tr><tr><td>
+<table class="t44" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
+<!--[if !mso]><!--><td class="t45" style="width:375px;">
+<!--<![endif]-->
+<!--[if mso]><td class="t45" style="width:375px;"><![endif]-->
+<p class="t51" style="margin:0;Margin:0;font-family:Helvetica,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:25px;font-weight:400;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;direction:ltr;color:#424242;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Kids turned out fine.</p></td>
+</tr></table>
+</td></tr><tr><td><div class="t52" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;</div></td></tr><tr><td>
+<table class="t59" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
+<!--[if !mso]><!--><td class="t60" style="background-color:#FCFCFC;width:400px;padding:20px 0 0 0;">
+<!--<![endif]-->
+<!--[if mso]><td class="t60" style="background-color:#FCFCFC;width:400px;padding:20px 0 0 0;"><![endif]-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td>
+<table class="t63" role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
+<!--[if !mso]><!--><td class="t64" style="background-color:#FCFCFC;">
+<!--<![endif]-->
+<!--[if mso]><td class="t64" style="background-color:#FCFCFC;"><![endif]-->
+<div class="t70" style="display:inline-table;width:100%;text-align:center;vertical-align:top;">
+<!--[if mso]>
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" valign="top" width="86"><tr><td class="t75" style="width:3px;" width="3"></td><td width="80" valign="top"><![endif]-->
+<div class="t76" style="display:inline-table;text-align:initial;vertical-align:inherit;width:100%;max-width:86px;"><div class="t77" style="padding:0 3px 0 3px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t78"><tr>
+<td class="t79" style="overflow:hidden;text-align:center;line-height:20px;mso-line-height-rule:exactly;mso-text-raise:2px;padding:5px 0 5px 0;border-radius:8px 8px 8px 8px;"><span class="t80" style="display:block;margin:0;Margin:0;font-family:BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif,'Fira Sans';line-height:20px;font-weight:500;font-style:normal;font-size:12px;text-decoration:none;direction:ltr;color:#CCCCCC;text-align:center;mso-line-height-rule:exactly;mso-text-raise:2px;">Unsubscribe</span></td>
+</tr></table>
+</div></div>
+<!--[if mso]>
+</td><td class="t75" style="width:3px;" width="3"></td>
+</tr></table>
+<![endif]-->
+</div></td>
+</tr></table>
+</td></tr></table></td>
+</tr></table>
+</td></tr></table></td>
+</tr></table>
+</div>
+<!--[if mso]>
+</td>
+</tr></table>
+<![endif]-->
+</div></td></tr></table></td></tr></table></div></body>
+</html>
+
+
     
+    
+    
+"""
+
+    send_email(recipient_email, subject, body)
